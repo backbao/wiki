@@ -1,0 +1,54 @@
+name: api-docs
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Node deps
+        run: npm ci
+
+      - name: Install Python deps
+        run: python -m pip install -r flask_api/requirements.txt
+
+      - name: Start Flask API
+        working-directory: flask_api
+        run: |
+          python app.py > ../flask_api.log 2>&1 &
+          echo $! > ../flask_api.pid
+
+      - name: Wait for OpenAPI
+        run: node -e "const url='http://127.0.0.1:5000/openapi/openapi.json'; const deadline=Date.now()+60000; (async()=>{for(;;){try{const res=await fetch(url); if(res.ok){process.exit(0)}}catch(e){} if(Date.now()>deadline){console.error('OpenAPI endpoint not ready'); process.exit(1)} await new Promise(r=>setTimeout(r,2000))}})()"
+
+      - name: Generate docs and changelog
+        run: npm run docs:generate
+
+      - name: Build docs
+        run: npm run docs:build
+
+      - name: Fail if generated files are stale
+        run: git diff --exit-code -- docs docs/.vitepress

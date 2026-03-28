@@ -1,0 +1,12 @@
+node_modules/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+docs/.vitepress/openapi-spec.prev.json
+flask_api/.venv/
+flask_api/venv/
+flask_api/__pycache__/
+flask_api/api/__pycache__/
+*.pyc
+.DS_Store
+*.log
+*.pid

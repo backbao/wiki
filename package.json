@@ -1,0 +1,21 @@
+{
+  "name": "ai-chat-docs",
+  "version": "1.0.0",
+  "scripts": {
+    "api:gen": "node scripts/generate-api-docs.mjs",
+    "api:watch": "node scripts/generate-api-docs.mjs watch",
+    "docs:generate": "node scripts/generate-api-docs.mjs sync",
+    "docs:dev": "node scripts/generate-api-docs.mjs && vitepress dev docs",
+    "docs:build": "node scripts/generate-api-docs.mjs && vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "dev": "concurrently \"npm run api:watch\" \"vitepress dev docs --host 0.0.0.0 --port 5173\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "vitepress": "latest"
+  },
+  "dependencies": {
+    "@scalar/api-reference": "^1.49.5",
+    "vue": "^3.5.31"
+  }
+}

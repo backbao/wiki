@@ -1,0 +1,27 @@
+[
+  {
+    "text": "API 文档",
+    "items": [
+      {
+        "text": "📡 接口总览",
+        "link": "/api/"
+      },
+      {
+        "text": "📝 接口变更",
+        "link": "/api/changelog"
+      },
+      {
+        "text": "ChatService",
+        "link": "/api/chatservice"
+      },
+      {
+        "text": "ImageService",
+        "link": "/api/imageservice"
+      },
+      {
+        "text": "🧪 在线调试",
+        "link": "/api/playground"
+      }
+    ]
+  }
+]

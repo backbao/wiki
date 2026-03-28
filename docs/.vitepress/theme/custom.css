@@ -1,0 +1,214 @@
+/* ──────── 企业级文档平台 · 全局自定义样式 ──────── */
+
+/* ── 导入字体 ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── 设计令牌覆盖 ── */
+:root {
+  /* 品牌色 — 科技蓝渐变 */
+  --vp-c-brand-1: #6366f1;
+  --vp-c-brand-2: #818cf8;
+  --vp-c-brand-3: #4f46e5;
+  --vp-c-brand-soft: rgba(99, 102, 241, 0.14);
+
+  /* 字体 */
+  --vp-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --vp-font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* 首页 Hero */
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+  --vp-home-hero-image-background-image: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.25) 0%,
+    rgba(168, 85, 247, 0.25) 50%,
+    rgba(236, 72, 153, 0.25) 100%
+  );
+  --vp-home-hero-image-filter: blur(68px);
+
+  /* 按钮 */
+  --vp-button-brand-bg: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --vp-button-brand-hover-bg: linear-gradient(135deg, #4f46e5, #7c3aed);
+}
+
+/* ── 暗黑模式令牌 ── */
+.dark {
+  --vp-c-bg: #0f0f14;
+  --vp-c-bg-soft: #1a1a24;
+  --vp-c-bg-mute: #22222e;
+  --vp-c-bg-alt: #161620;
+}
+
+/* ── 首页 Hero 增强 ── */
+.VPHero .name {
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+}
+
+.VPHero .text {
+  font-size: 2rem !important;
+  background: linear-gradient(135deg, var(--vp-c-text-1) 60%, var(--vp-c-brand-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.VPHero .tagline {
+  font-size: 1.1rem !important;
+  opacity: 0.8;
+  line-height: 1.6;
+}
+
+/* ── Feature 卡片 ── */
+.VPFeature {
+  border: 1px solid var(--vp-c-divider) !important;
+  border-radius: 16px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  background: var(--vp-c-bg-soft) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.VPFeature::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.04), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.VPFeature:hover {
+  transform: translateY(-4px);
+  border-color: var(--vp-c-brand-1) !important;
+  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.12);
+}
+
+.VPFeature:hover::before {
+  opacity: 1;
+}
+
+/* ── API 徽章栏 ── */
+.api-badge-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.api-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 100px;
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  letter-spacing: 0.01em;
+}
+
+/* ── API 文档内容增强 ── */
+.vp-doc h3 code {
+  font-size: 0.9em;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--vp-c-bg-mute);
+  font-weight: 500;
+}
+
+.vp-doc table {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc table th {
+  background: var(--vp-c-bg-soft) !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+
+.vp-doc table td {
+  font-size: 14px;
+}
+
+.vp-doc table tr:hover td {
+  background: var(--vp-c-bg-soft);
+}
+
+/* ── 平滑滚动 ── */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── 侧边栏动画 ── */
+.VPSidebar .VPSidebarItem {
+  transition: all 0.2s ease;
+}
+
+.VPSidebar .VPSidebarItem:hover {
+  transform: translateX(2px);
+}
+
+/* ── 自定义滚动条 ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--vp-c-divider);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vp-c-text-3);
+}
+
+/* ── 页面过渡 ── */
+.VPContent {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Code 块增强 ── */
+.vp-doc div[class*='language-'] {
+  border-radius: 12px !important;
+  border: 1px solid var(--vp-c-divider);
+}
+
+/* ── 导航栏玻璃态 ── */
+.VPNav {
+  backdrop-filter: blur(12px) saturate(150%) !important;
+}
+
+/* ── 分隔线美化 ── */
+.vp-doc hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--vp-c-divider),
+    transparent
+  );
+  margin: 32px 0;
+}
