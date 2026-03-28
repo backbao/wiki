@@ -1,0 +1,18 @@
+{
+  "latest": "v20260328T074034Z",
+  "versions": [
+    {
+      "version": "v20260328T074034Z",
+      "created_at": "2026-03-28T07:40:34Z",
+      "spec_hash": "4d10cb6e4f94762dd228c692795ff151718e3c4fc3c32b45bda712cd96eb9a11",
+      "parent_version": null,
+      "spec_file": "versions/v20260328T074034Z.json",
+      "diff_file": "diffs/v20260328T074034Z.json",
+      "summary": {
+        "added": 0,
+        "removed": 0,
+        "changed": 0
+      }
+    }
+  ]
+}

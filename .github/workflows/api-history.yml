@@ -1,0 +1,46 @@
+name: api-history
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install Python deps
+        run: python -m pip install -r flask_api/requirements.txt
+
+      - name: Sync OpenAPI history
+        run: python scripts/sync-openapi-history.py
+
+      - name: Validate backend routes
+        working-directory: flask_api
+        run: |
+          python - <<'PY'
+          import app as m
+          client = m.app.test_client()
+          for path in ['/openapi/openapi.json', '/openapi/versions', '/openapi/changelog']:
+              resp = client.get(path)
+              assert resp.status_code == 200, path
+          print('backend routes ok')
+          PY
+
+      - name: Fail if generated history is stale
+        run: git diff --exit-code -- flask_api/openapi_history
