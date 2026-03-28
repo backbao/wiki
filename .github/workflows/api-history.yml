@@ -25,7 +25,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install Python deps
-        run: python -m pip install -r flask_api/requirements.txt
+        run: python -m pip install -r flask_api/requirements.lock
 
       - name: Sync OpenAPI history
         run: python scripts/sync-openapi-history.py
