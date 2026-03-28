@@ -24,6 +24,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       VITEPRESS_BASE: /wiki/
     steps:
@@ -52,11 +53,24 @@ jobs:
       - name: Start Flask API
         working-directory: flask_api
         run: |
-          python app.py > ../flask_api.log 2>&1 &
+          nohup env PYTHONUNBUFFERED=1 python app.py > ../flask_api.log 2>&1 &
           echo $! > ../flask_api.pid
 
       - name: Wait for OpenAPI
-        run: node -e "const url='http://127.0.0.1:5000/openapi/openapi.json'; const deadline=Date.now()+60000; (async()=>{for(;;){try{const res=await fetch(url); if(res.ok){process.exit(0)}}catch(e){} if(Date.now()>deadline){console.error('OpenAPI endpoint not ready'); process.exit(1)} await new Promise(r=>setTimeout(r,2000))}})()"
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:5000/openapi/openapi.json >/dev/null; then
+              echo "OpenAPI endpoint is ready"
+              exit 0
+            fi
+            echo "Waiting for OpenAPI endpoint ($i/30)"
+            sleep 2
+          done
+
+          echo "::group::Flask log"
+          sed -n '1,200p' ../flask_api.log || true
+          echo "::endgroup::"
+          exit 1
 
       - name: Generate docs and changelog
         run: npm run docs:generate
