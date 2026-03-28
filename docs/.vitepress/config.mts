@@ -26,6 +26,7 @@ function loadSidebar() {
 export default defineConfig({
   title: 'AI Chat Docs',
   description: '后端接口文档与变更清单',
+  base: process.env.VITEPRESS_BASE || '/',
   cleanUrls: true,
   lastUpdated: true,
   themeConfig: {
