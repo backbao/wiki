@@ -93,6 +93,18 @@ def page(title: str, body: str, active: str = "", prefix: str = "") -> str:
       .section-title {{ display: flex; justify-content: space-between; align-items: end; gap: 12px; }}
       .section-title h2, .section-title h3 {{ margin: 0; }}
       .stack {{ display: flex; flex-direction: column; gap: 6px; }}
+      .endpoint-list {{ display: grid; gap: 12px; margin-top: 14px; }}
+      .endpoint {{ border: 1px solid var(--line); border-radius: 16px; padding: 16px; background: rgba(255,255,255,0.02); }}
+      .endpoint-head {{ display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }}
+      .endpoint h3 {{ margin: 12px 0 8px; }}
+      .endpoint-meta {{ display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }}
+      .method {{ font-weight: 700; letter-spacing: 0.04em; }}
+      .method-get {{ color: var(--green); }}
+      .method-post {{ color: #93c5fd; }}
+      .method-put {{ color: #fcd34d; }}
+      .method-patch {{ color: #fdba74; }}
+      .method-delete {{ color: var(--red); }}
+      .method-head, .method-options {{ color: var(--muted); }}
     </style>
   </head>
   <body>
@@ -117,6 +129,48 @@ def fmt_counts(summary: dict[str, int]) -> str:
         f'<span class="badge removed">删除 {summary.get("removed", 0)}</span>'
         f'<span class="badge changed">变更 {summary.get("changed", 0)}</span>'
     )
+
+
+def collect_endpoints(spec: dict) -> list[dict]:
+    endpoints: list[dict] = []
+    for http_path, methods in (spec.get("paths") or {}).items():
+        for method, operation in methods.items():
+            if method not in {"get", "post", "put", "patch", "delete", "head", "options"}:
+                continue
+            endpoints.append(
+                {
+                    "method": method.upper(),
+                    "path": http_path,
+                    "summary": operation.get("summary") or "未命名接口",
+                    "description": operation.get("description") or "",
+                    "tags": operation.get("tags") or ["default"],
+                    "parameters": operation.get("parameters") or [],
+                    "responses": list((operation.get("responses") or {}).keys()),
+                }
+            )
+    return sorted(endpoints, key=lambda item: f"{item['method']} {item['path']}")
+
+
+def render_endpoint_card(endpoint: dict) -> str:
+    method = endpoint["method"].lower()
+    tag_text = " · ".join(endpoint.get("tags") or [])
+    params = endpoint.get("parameters") or []
+    resp = endpoint.get("responses") or []
+    return f"""
+    <div class="endpoint">
+      <div class="endpoint-head">
+        <span class="method method-{method}">{escape(endpoint["method"])}</span>
+        <code>{escape(endpoint["path"])}</code>
+      </div>
+      <h3>{escape(endpoint["summary"])}</h3>
+      <p class="muted">{escape(endpoint["description"])}</p>
+      <div class="endpoint-meta">
+        <span class="badge">{escape(tag_text)}</span>
+        <span class="badge">参数 {len(params)}</span>
+        <span class="badge">响应 {len(resp)}</span>
+      </div>
+    </div>
+    """
 
 
 def render_diff_table(items: list[dict], kind: str) -> str:
@@ -150,12 +204,17 @@ def render_index(manifest: dict) -> str:
             latest_entry = entry
             break
 
+    latest_spec = read_json(HISTORY_DIR / "versions" / f"{latest_version}.json") if latest_version else None
+    endpoints = collect_endpoints(latest_spec) if latest_spec else []
+    tags = sorted({tag for endpoint in endpoints for tag in (endpoint.get("tags") or [])})
     latest_counts = latest_entry.get("summary", {}) if latest_entry else {}
     body = [
         '<div class="card">',
-        '<div class="section-title"><h2>当前状态</h2><span class="muted">来源：flask_api/openapi_history</span></div>',
+        '<div class="section-title"><h2>最新文档</h2><span class="muted">Scalar 风格静态页</span></div>',
         '<div class="grid">',
         f'<div class="stat"><span class="muted">最新版本</span><strong>{escape(latest_version or "-")}</strong></div>',
+        f'<div class="stat"><span class="muted">接口数量</span><strong>{len(endpoints)}</strong></div>',
+        f'<div class="stat"><span class="muted">标签数量</span><strong>{len(tags)}</strong></div>',
         f'<div class="stat"><span class="muted">新增</span><strong>{latest_counts.get("added", 0)}</strong></div>',
         f'<div class="stat"><span class="muted">删除</span><strong>{latest_counts.get("removed", 0)}</strong></div>',
         f'<div class="stat"><span class="muted">变更</span><strong>{latest_counts.get("changed", 0)}</strong></div>',
@@ -173,6 +232,21 @@ def render_index(manifest: dict) -> str:
             ]
         )
     body.append("</div>")
+
+    if latest_spec:
+        body.append('<div class="card"><div class="section-title"><h2>接口参考</h2><span class="muted">按当前最新规范渲染</span></div>')
+        current_tag = None
+        for endpoint in endpoints:
+            first_tag = (endpoint.get("tags") or ["default"])[0]
+            if first_tag != current_tag:
+                if current_tag is not None:
+                    body.append("</div>")
+                current_tag = first_tag
+                body.append(f'<h3 style="margin-top:18px;">{escape(first_tag)}</h3><div class="endpoint-list">')
+            body.append(render_endpoint_card(endpoint))
+        if current_tag is not None:
+            body.append("</div>")
+        body.append("</div>")
 
     body.append('<div class="card"><h2>版本历史</h2><table><thead><tr><th>版本</th><th>时间</th><th>摘要</th><th>操作</th></tr></thead><tbody>')
     for entry in reversed(manifest.get("versions", [])):
