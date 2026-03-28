@@ -2,6 +2,7 @@ node_modules/
 docs/.vitepress/cache/
 docs/.vitepress/dist/
 docs/.vitepress/openapi-spec.prev.json
+site/
 flask_api/.venv/
 flask_api/venv/
 flask_api/__pycache__/
